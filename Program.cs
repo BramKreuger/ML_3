@@ -14,7 +14,7 @@ namespace ML_3
         static int M = 1; //Dit moet anders
         static int d = 57;
         static Matrix<double> x;
-        static Vector<int>    y;
+        static Vector<double>    y;
         static Vector<double> w;
 
         static void Main(string[] args)
@@ -31,7 +31,7 @@ namespace ML_3
         ///<summary>
         ///Transforms list of "mail" data into an x matrix and an y vector
         ///</summary>
-        static Tuple<Matrix<double>, Vector<int>> ToMatrix(bool randomized)
+        static Tuple<Matrix<double>, Vector<double>> ToMatrix(bool randomized)
         {
             SpamClassificatie main = new SpamClassificatie();
 
@@ -52,14 +52,14 @@ namespace ML_3
                 }
             }
 
-            Vector<int> y = Vector<int>.Build.Dense(N); //Create y Vector
+            Vector<double> y = Vector<double>.Build.Dense(N); //Create y Vector
 
             for (int i = 0; i < N; i++)
             {
                 y[i] = allData[i].y; //Fill y Vector
             }
 
-            return new Tuple<Matrix<double>, Vector<int>>(x, y);
+            return new Tuple<Matrix<double>, Vector<double>>(x, y);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace ML_3
             double errM = 0;
             for (int i = 0; i < N; i++) //Itereer door de datapunten heen
             {
-                errM += (w[i] * I(y[i], BaseLearner(m, i))) / w[i];
+                errM += (w[i] * I(Convert.ToInt32(y[i]), BaseLearner(m, i))) / w[i];
             }
             return errM;
         }
