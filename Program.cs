@@ -11,6 +11,7 @@ namespace ML_3
     class Program
     {
         static int N;
+        static int M = 1; //Dit moet anders
         static int d = 57;
         static Matrix<double> x;
         static Vector<int>    y;
@@ -23,6 +24,9 @@ namespace ML_3
             y = xy.Item2;
             w = CreateWheights();
         }
+
+        #region Voor het initaliseren van de matrices en gewichten.
+
 
         ///<summary>
         ///Transforms list of "mail" data into an x matrix and an y vector
@@ -63,35 +67,72 @@ namespace ML_3
         /// </summary>
         static Vector<double> CreateWheights() => Vector<double>.Build.Dense(N, 1 / N);
 
+
+        #endregion
+
+        #region Voor het berekenen van de uiteindelijke G(x)
+
+
         /// <summary>
-        /// Dit is stap (3) hier snap ik dus geen kut van!
+        /// Geef als input welk model hij meekrijgt en welk datapunt hij moet classificeren..?
         /// </summary>
-        static void BaseLearner()
+        static int BaseLearner(int m, int x)
         {
-            /*
-            p>  = w>+ /  (w>+ + w>-);
-            e>  = 2p >   (1 - p>);
-            p=< = w=<+ / (w=<+ + w=<-);
-            e=< = 2p=<   (1 - p=<);
-            e   = (w>+ + w>-)e> + (w=<+ + w=<-)e=< .
-            */
-
-            //Calculating w's
-
-            double wGrPl;
-            double wGrMi;
-            double wSmPl;
-            double wSmMi;
-
-            double b = 0.5;
-            for (int i = 0; i < N; i++)
-            {
-                for (int j = 0; j < d; j++)
-                {
-
-                }
-            }
+            return 1; //Hij moet per datapunt goed of fout, dus 1 of -1 returnen.
         }        
+
+        /// <summary>
+        /// Berekend de error functie zoals beschreven in slide 19 van college 12b.
+        /// </summary>
+        /// <returns></returns>
+        static double Error(int m)
+        {
+            double errM = 0;
+            for (int i = 0; i < N; i++) //Itereer door de datapunten heen
+            {
+                errM += (w[i] * I(y[i], BaseLearner(m, i))) / w[i];
+            }
+            return errM;
+        }
+
+        /// <summary>
+        /// Bereken de Alpha waarde zoals beschreven in slide 19 van college 12b.
+        /// </summary>
+        static double Alpha(int m)
+        {
+            return (1 / 2) * Math.Log((1 - Error(m)) / Error(m));
+        }
+
+        /// <summary>
+        /// Itereer over alle gewichten heen en update ze en normaliseer ze daarna.
+        /// </summary>
+        static void UpdateWeights(int m)
+        {
+            double weightSum = 0;
+            for (int i = 0; i < N; i++) //Update gewichten
+            {
+                w[i] = w[i] * Math.Exp(-y[i] * BaseLearner(m, i) * Alpha(m));
+                weightSum += w[i];
+            }
+
+            for (int i = 0; i < N; i++) //Normaliseer de gewichten door ze te delen door het totale gewicht.
+            {
+                w[i] = w[i] / weightSum;
+            }
+        }
+
+        /// <summary>
+        /// De "I" functie uit de error formule, vergelijkt of 2 int's gelijk zijn zoja: +1, anders -1.
+        /// </summary>
+        static int I(int a, int b)
+        {
+            if (a == b) return 1;
+            else return -1;
+        }
+
+        //En dan nog een eindfunctie die G(X) berekend...
+
+        #endregion
     }
 
     //Deze onderstaande dingen zijn voor het random shuffelen van de mail lijst
